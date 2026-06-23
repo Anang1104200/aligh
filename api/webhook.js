@@ -3,9 +3,9 @@ const FormData = require("form-data");
 const emailGen = require("../lib/emailGenerator");
 
 // ─── ENV ──────────────────────────────────────────────────────────────────────
-const BOT_TOKEN = "8946414324:AAHs7DM1vxOqsWu_-lEbgozElMxg3OCj2P4";
-const API_KEY   = "aII4r";
-const OWNER_ID  = "903400272";
+const BOT_TOKEN = process.env.BOT_TOKEN;
+const API_KEY   = process.env.THERESAV_APIKEY;
+const OWNER_ID  = process.env.OWNER_ID || "8656325799";
 
 if (!BOT_TOKEN) throw new Error("BOT_TOKEN env tidak di-set!");
 if (!API_KEY)   throw new Error("THERESAV_APIKEY env tidak di-set!");
