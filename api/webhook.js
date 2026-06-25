@@ -264,7 +264,7 @@ function buildVerifyText(email, parsed, label = "") {
     t += `📄 *Isi Email:*\n_${parsed.body.slice(0, 400) || "(kosong)"}_\n\n`;
   }
 
-  t += `━━━━━━━━━━━━━━━━━━━━━━━━\n_Satriadevs | Codersteam_`;
+  t += `━━━━━━━━━━━━━━━━━━━━━━━━\n_Anang fatkhurosidin_`;
   return t;
 }
 
@@ -315,7 +315,7 @@ async function startLiveInbox(chat_id, email, knownCount, uname, userId) {
     `⌛ *Inbox Timeout*\n\n` +
     `Tidak ada email verifikasi baru dalam 10 menit.\n` +
     `Gunakan /gtemp untuk coba lagi.\n\n` +
-    `_Satriadevs | Codersteam_`
+    `_Anang fatkhurosidin_`
   ).catch(() => {});
 }
 
@@ -357,7 +357,7 @@ async function handleGtemp(msg, domainArg) {
       `4️⃣ Bot otomatis kirim *kode/link verifikasi* ke sini!\n\n` +
       `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
       `📡 *Inbox dipantau selama 10 menit...*\n\n` +
-      `_Satriadevs | Codersteam_`
+      `_Anang fatkhurosidin_`
     );
     await react(chat_id, message_id, "✅");
 
@@ -409,7 +409,7 @@ async function handleAmPremium(msg, email) {
       `2️⃣ Klik tombol *"Login"* di email dari Alight Motion\n` +
       `3️⃣ Salin URL lengkap di address bar browser\n\n` +
       `💡 _Setelah dapat link, gunakan /amverify_\n` +
-      `_Satriadevs | Codersteam_`
+      `_Anang fatkhurosidin_`
     );
     await react(chat_id, mid, "✅");
   } catch (e) {
@@ -445,7 +445,7 @@ async function handleAmVerify(msg, args) {
       ` ◦ *Durasi:* \`${durText}\` ⏳\n\n` +
       `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
       `✅ Akun kamu sudah *PRO / PREMIUM*!\n` +
-      `_Satriadevs | Codersteam_`
+      `_Anang fatkhurosidin__`
     );
     await react(chat_id, mid, "✅");
   } catch (e) {
@@ -640,7 +640,7 @@ async function handleCallback(cb) {
 
   // Cek akses untuk fitur
   if (!isAllowed(uid)) {
-    return sendMsg(chat_id, `🔒 *Akses Ditolak*\n\nKamu belum di-add sama *Satria*.\nHubungi owner untuk mendapatkan akses.`);
+    return sendMsg(chat_id, `🔒 *Akses Ditolak*\n\nKamu belum di-add sama *_Anang fatkhurosidin_*.\nHubungi owner untuk mendapatkan akses.`);
   }
 
   if (data === "menu_gtemp")     return sendMsg(chat_id, `🚀 *Auto AM Premium*\n\nKetik:\n/gtemp — domain random\n/gtemp maildy.site — domain pilihan`);
@@ -684,9 +684,9 @@ async function processUpdate(update) {
     // Di grup: hanya balas jika pesan adalah command
     if (isGroup(chat)) {
       if (!text.startsWith("/")) return; // abaikan pesan biasa di grup
-      return sendMsg(chat.id, `🔒 ${name}, kamu belum di-add sama *Satria*.\nHubungi owner untuk mendapatkan akses.`);
+      return sendMsg(chat.id, `🔒 ${name}, kamu belum di-add sama *_Anang fatkhurosidin_*.\nHubungi owner untuk mendapatkan akses.`);
     }
-    return sendMsg(chat.id, `🔒 *Akses Ditolak*\n\nKamu belum di-add sama *Satria*.\nHubungi owner untuk mendapatkan akses.`);
+    return sendMsg(chat.id, `🔒 *Akses Ditolak*\n\nKamu belum di-add sama *_Anang fatkhurosidin_*.\nHubungi owner untuk mendapatkan akses.`);
   }
 
   // Owner commands
