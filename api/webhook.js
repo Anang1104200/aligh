@@ -1,7 +1,7 @@
 const axios = require("axios");
 const FormData = require("form-data");
 const emailGen = require("../lib/emailGenerator");
-
+//
 // ─── ENV ──────────────────────────────────────────────────────────────────────
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const API_KEY = process.env.THERESAV_APIKEY;
