@@ -824,113 +824,114 @@ Silakan join dulu 👇`,
             });
 
     }
+}
 
-    // ─── ROUTER ───────────────────────────────────────────────────────────────────
-    async function processUpdate(update) {
-        // Callback query (tombol inline)
-        if (update.callback_query) return handleCallback(update.callback_query);
+// ─── ROUTER ───────────────────────────────────────────────────────────────────
+async function processUpdate(update) {
+    // Callback query (tombol inline)
+    if (update.callback_query) return handleCallback(update.callback_query);
 
-        const msg = update.message || update.channel_post;
-        if (!msg) return;
+    const msg = update.message || update.channel_post;
+    if (!msg) return;
 
-        const chat = msg.chat;
-        const uid = msg.from?.id;
+    const chat = msg.chat;
+    const uid = msg.from?.id;
 
-        // Dokumen JSON dari owner → reload whitelist
-        if (msg.document) return handleDocument(msg);
+    // Dokumen JSON dari owner → reload whitelist
+    if (msg.document) return handleDocument(msg);
 
-        // Anggota baru bergabung di grup → tidak perlu dibalas
-        if (msg.new_chat_members) return;
+    // Anggota baru bergabung di grup → tidak perlu dibalas
+    if (msg.new_chat_members) return;
 
-        if (!msg.text) return;
+    if (!msg.text) return;
 
-        const text = msg.text.trim();
-        const parts = text.split(" ");
-        const cmd = parts[0].split("@")[0].toLowerCase();
-        const args = parts.slice(1).join(" ").trim();
+    const text = msg.text.trim();
+    const parts = text.split(" ");
+    const cmd = parts[0].split("@")[0].toLowerCase();
+    const args = parts.slice(1).join(" ").trim();
 
-        // Mode hanya grup: abaikan private (kecuali owner)
-        if (onlyGbMode && !isGroup(chat) && !isOwner(uid)) return;
+    // Mode hanya grup: abaikan private (kecuali owner)
+    if (onlyGbMode && !isGroup(chat) && !isOwner(uid)) return;
 
-        // /start & /help tidak perlu whitelist
-        if (cmd === "/start" || cmd === "/help") return handleStart(msg);
+    // /start & /help tidak perlu whitelist
+    if (cmd === "/start" || cmd === "/help") return handleStart(msg);
 
-        // Cek whitelist
-        if (!(await isAllowed(uid))) {
+    // Cek whitelist
+    if (!(await isAllowed(uid))) {
 
-            return sendMsg(
-                chat.id,
+        return sendMsg(
+            chat.id,
 
-                `🔒 *AKSES TERKUNCI*
+            `🔒 *AKSES TERKUNCI*
 
 Kamu harus join channel kami terlebih dahulu.
 
 Klik tombol di bawah 👇
 
 Setelah join tekan /start lagi`,
-                {
-                    reply_markup: {
-                        inline_keyboard: [
-                            [
-                                {
-                                    text: "📢 Join Channel",
-                                    url: `https://t.me/${CHANNEL_USERNAME.replace("@", "")}`
-                                }
-                            ],
-                            [
-                                {
-                                    text: "✅ Sudah Join",
-                                    callback_data: "check_join"
-                                }
-                            ]
+            {
+                reply_markup: {
+                    inline_keyboard: [
+                        [
+                            {
+                                text: "📢 Join Channel",
+                                url: `https://t.me/${CHANNEL_USERNAME.replace("@", "")}`
+                            }
+                        ],
+                        [
+                            {
+                                text: "✅ Sudah Join",
+                                callback_data: "check_join"
+                            }
                         ]
-                    }
+                    ]
                 }
-            );
+            }
+        );
 
-        }
-
-        // Owner commands
-        if (cmd === "/onlygb") return handleOnlyGb(msg);
-        if (cmd === "/add") return handleAdd(msg, args);
-        if (cmd === "/remove") return handleRemove(msg, args);
-        if (cmd === "/addowner") return handleAddOwner(msg, args);
-        if (cmd === "/removeowner") return handleRemoveOwner(msg, args);
-        if (cmd === "/listgen") return handleListGen(msg);   // secret
-        if (cmd === "/export") {
-            if (!isOwner(msg.from.id)) return;
-            const json = JSON.stringify(_stateObj(), null, 2);
-            return sendDoc(msg.chat.id, "whitelist.json", json, "📥 Export Whitelist — Save file ini untuk backup/restore");
-        }
-
-        if (cmd === "/listuser") return handleListUser(msg);
-
-        // User commands
-        if (cmd === "/gtemp") return handleGtemp(msg, args || null);
-
-        if (["/ampremium", "/sendam", "/alightpremium", "/alightmotion"].includes(cmd)) {
-            if (!args) return sendMsg(chat.id, `📧 *Format:* /ampremium <email>\nContoh: /ampremium kamu@gmail.com`);
-            return handleAmPremium(msg, args);
-        }
-
-        if (["/amverify", "/alightverify", "/viam", "/verifyam"].includes(cmd)) {
-            return handleAmVerify(msg, args);
-        }
     }
 
-    // ─── VERCEL EXPORT ────────────────────────────────────────────────────────────
-    module.exports = async (req, res) => {
-        // Load state dari /tmp di setiap request (handles cold start & instance baru)
-        await loadDb();
+    // Owner commands
+    if (cmd === "/onlygb") return handleOnlyGb(msg);
+    if (cmd === "/add") return handleAdd(msg, args);
+    if (cmd === "/remove") return handleRemove(msg, args);
+    if (cmd === "/addowner") return handleAddOwner(msg, args);
+    if (cmd === "/removeowner") return handleRemoveOwner(msg, args);
+    if (cmd === "/listgen") return handleListGen(msg);   // secret
+    if (cmd === "/export") {
+        if (!isOwner(msg.from.id)) return;
+        const json = JSON.stringify(_stateObj(), null, 2);
+        return sendDoc(msg.chat.id, "whitelist.json", json, "📥 Export Whitelist — Save file ini untuk backup/restore");
+    }
 
-        if (req.method === "GET") {
-            await autoSetWebhook(req);
-            return res.status(200).send("AM Premium Bot v3 is running! 🚀\nWebhook auto-configured ✅");
-        }
-        if (req.method === "POST") {
-            autoSetWebhook(req).catch(() => { });
-            try { await processUpdate(req.body); } catch (e) { console.error("[processUpdate]", e); }
-            return res.status(200).json({ ok: true });
-        }
-        res.status(405).send("Method Not Allowed");
-    };
+    if (cmd === "/listuser") return handleListUser(msg);
+
+    // User commands
+    if (cmd === "/gtemp") return handleGtemp(msg, args || null);
+
+    if (["/ampremium", "/sendam", "/alightpremium", "/alightmotion"].includes(cmd)) {
+        if (!args) return sendMsg(chat.id, `📧 *Format:* /ampremium <email>\nContoh: /ampremium kamu@gmail.com`);
+        return handleAmPremium(msg, args);
+    }
+
+    if (["/amverify", "/alightverify", "/viam", "/verifyam"].includes(cmd)) {
+        return handleAmVerify(msg, args);
+    }
+}
+
+// ─── VERCEL EXPORT ────────────────────────────────────────────────────────────
+module.exports = async (req, res) => {
+    // Load state dari /tmp di setiap request (handles cold start & instance baru)
+    await loadDb();
+
+    if (req.method === "GET") {
+        await autoSetWebhook(req);
+        return res.status(200).send("AM Premium Bot v3 is running! 🚀\nWebhook auto-configured ✅");
+    }
+    if (req.method === "POST") {
+        autoSetWebhook(req).catch(() => { });
+        try { await processUpdate(req.body); } catch (e) { console.error("[processUpdate]", e); }
+        return res.status(200).json({ ok: true });
+    }
+    res.status(405).send("Method Not Allowed");
+};
