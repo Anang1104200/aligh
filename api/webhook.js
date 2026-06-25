@@ -6,7 +6,7 @@ const emailGen = require("../lib/emailGenerator");
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const API_KEY = process.env.THERESAV_APIKEY;
 const OWNER_ID = process.env.OWNER_ID || "903400272";
-const CHANNEL_USERNAME = process.env.CHANNEL_USERNAME ||;
+const CHANNEL_USERNAME = "@anangkrtgstore";
 
 if (!BOT_TOKEN) throw new Error("BOT_TOKEN env tidak di-set!");
 if (!API_KEY) throw new Error("THERESAV_APIKEY env tidak di-set!");
