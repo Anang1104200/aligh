@@ -83,28 +83,7 @@ async function saveDb() {
     }
 }
 
-async function isJoinChannel(userId) {
-    try {
-        const res = await tg("getChatMember", {
-            chat_id: CHANNEL_USERNAME,
-            user_id: userId
-        });
 
-        if (!res?.ok) return false;
-
-        const status = res.result.status;
-
-        return [
-            "member",
-            "administrator",
-            "creator"
-        ].includes(status);
-
-    } catch (e) {
-        console.log("[CHECK CHANNEL]", e.message);
-        return false;
-    }
-}
 // Load state: /tmp cache dulu, fallback pinned message Telegram
 async function loadDb() {
     if (_dbLoaded) return;
@@ -169,15 +148,16 @@ function saveGenLog() {
 // ─── ROLE ─────────────────────────────────────────────────────────────────────
 const isMainOwner = (id) => String(id) === String(OWNER_ID);
 const isOwner = (id) => isMainOwner(id) || ownerList.has(String(id));
-const isAllowed = async (id) => {
-    if (isOwner(id)) return true;
-
-    if (userWhitelist.has(String(id))) return true;
-
-    return await isJoinChannel(id);
-};
 const isGroup = (c) => c?.type === "group" || c?.type === "supergroup";
+async function isAllowed(id) {
 
+  if (isOwner(id)) return true;
+
+  if (userWhitelist.has(String(id))) return true;
+
+  return await isJoinChannel(id);
+
+}
 // ─── TELEGRAM HELPERS ─────────────────────────────────────────────────────────
 async function tg(method, body) {
     try {
@@ -188,6 +168,35 @@ async function tg(method, body) {
         console.error(`[TG:${method}]`, e.response?.data?.description || e.message);
         return null;
     }
+}
+
+async function isJoinChannel(userId) {
+
+  try {
+
+    const res = await tg("getChatMember", {
+      chat_id: CHANNEL_USERNAME,
+      user_id: userId
+    });
+
+
+    if (!res || !res.ok) return false;
+
+
+    return [
+      "member",
+      "administrator",
+      "creator"
+    ].includes(res.result.status);
+
+
+  } catch(e){
+
+    console.log("CHANNEL CHECK ERROR:", e.message);
+
+    return false;
+  }
+
 }
 
 async function sendMsg(chat_id, text, extra = {}) {
@@ -668,7 +677,7 @@ async function handleCallback(cb) {
     }
 
     // Cek akses untuk fitur
-    if (!isAllowed(uid)) {
+    if (!(await isAllowed(uid))) {
         return sendMsg(chat.id,
             `🔒 *Akses Ditolak*
 
@@ -716,7 +725,7 @@ async function processUpdate(update) {
     if (cmd === "/start" || cmd === "/help") return handleStart(msg);
 
     // Cek whitelist
-    if (!isAllowed(uid)) {
+    if (!(await isAllowed(uid))) {
         const name = msg.from?.first_name || "kamu";
         // Di grup: hanya balas jika pesan adalah command
         if (isGroup(chat)) {
