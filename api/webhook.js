@@ -741,11 +741,17 @@ Pilih menu di bawah:`,
 
 // ─── CALLBACK QUERY ───────────────────────────────────────────────────────────
 async function handleCallback(cb) {
+
     const chat_id = cb.message.chat.id;
     const uid = cb.from.id;
     const data = cb.data;
-    await tg("answerCallbackQuery", { callback_query_id: cb.id });
 
+    await tg("answerCallbackQuery", {
+        callback_query_id: cb.id
+    });
+
+
+    // tombol cek join
     if (data === "check_join") {
 
         const joined = await isJoinChannel(uid);
@@ -760,70 +766,117 @@ async function handleCallback(cb) {
         return handleStart(cb.message);
     }
 
+
+
+    // HELP bebas akses
     if (data === "menu_help") {
+
         const ownerSec = isOwner(uid)
-            ? `\n\n👑 *OWNER:*\n/add /remove /addowner /removeowner /onlygb /listuser`
-            : "";
-        return sendMsg(chat_id,
-            `📋 *COMMAND:*\n\n` +
-            `🔹 /gtemp \`[domain]\` — Auto generate & verifikasi AM\n` +
-            `🔹 /ampremium \`<email>\` — Kirim link ke email kamu\n` +
-            `🔹 /amverify \`<email> | <link>\` — Verifikasi manual` +
-            ownerSec
-        );
-    }
-
-    if (data === "menu_owner") {
-        if (!isOwner(uid)) return sendMsg(chat_id, "❌ Bukan owner.");
-        return sendMsg(chat_id,
-            `👑 *PANEL OWNER*\n\n` +
-            `👥 User: *${userWhitelist.size}*\n` +
-            `👑 Sub-Owner: *${ownerList.size}*\n` +
-            `🏘️ Only Grup: *${onlyGbMode ? "ON ✅" : "OFF ❌"}*\n\n` +
-            `*MANAGE USER:*\n` +
-            `/add \`<id>\` — Tambah user\n` +
-            `/remove \`<id>\` — Hapus user\n` +
-            `/addowner \`<id>\` — Jadikan sub-owner\n` +
-            `/removeowner \`<id>\` — Copot sub-owner\n` +
-            `/listuser — Lihat semua user\n` +
-            `/onlygb — Toggle mode hanya grup\n\n` +
-            `*BACKUP & RESTORE:*\n` +
-            `/export — Download whitelist.json (backup)\n` +
-            `📎 _Kirim whitelist.json ke bot untuk restore_\n` +
-            `_ID akan tetap permanen sesuai JSON yang kamu kirim_`
-        );
-    }
-
-    // Cek akses untuk fitur
-    if (!(await isAllowed(uid))) {
+            ?
+            `\n\n👑 *OWNER:*\n/add /remove /addowner /removeowner /onlygb /listuser`
+            :
+            "";
 
         return sendMsg(
             chat_id,
-            `🔒 *AKSES TERKUNCI*
+            `📋 *COMMAND:*
 
-Kamu belum join channel.
+🔹 /gtemp [domain]
+🔹 /ampremium <email>
+🔹 /amverify <email> | <link>`
+            + ownerSec
+        );
+    }
 
-Silakan join dulu 👇`,
-            {
-                reply_markup: {
-                    inline_keyboard: [
-                        [
-                            {
-                                text: "📢 Join Channel",
-                                url: `https://t.me/${CHANNEL_USERNAME.replace("@", "")}`
-                            }
-                        ],
-                        [
-                            {
-                                text: "✅ Verifikasi Join",
-                                callback_data: "check_join"
-                            }
-                        ]
-                    ]
-                }
-            });
+
+
+    // OWNER
+    if (data === "menu_owner") {
+
+        if (!isOwner(uid))
+            return sendMsg(chat_id, "❌ Bukan owner.");
+
+        return sendMsg(
+            chat_id,
+            `👑 *PANEL OWNER*
+
+👥 User: ${userWhitelist.size}
+👑 Owner: ${ownerList.size}
+
+/add
+/remove
+/addowner
+/removeowner
+/listuser`
+        );
+    }
+
+
+
+
+    // cek akses setelah menu umum
+    if (!isAllowed(uid)) {
+
+        return sendMsg(
+            chat_id,
+            `🔒 *Akses Ditolak*
+
+Kamu harus join channel dulu.`
+        );
+    }
+
+
+
+
+    // MENU USER
+
+    if (data === "menu_gtemp") {
+
+        return sendMsg(
+            chat_id,
+            `🚀 *Auto AM Premium*
+
+Ketik:
+/gtemp
+
+atau
+
+/gtemp domain.com`
+        );
 
     }
+
+
+
+    if (data === "menu_ampremium") {
+
+        return sendMsg(
+            chat_id,
+            `📧 *Send Email AM*
+
+Format:
+
+/ampremium email@gmail.com`
+        );
+
+    }
+
+
+
+
+    if (data === "menu_amverify") {
+
+        return sendMsg(
+            chat_id,
+            `✅ *Verifikasi AM*
+
+Format:
+
+/amverify email | link`
+        );
+
+    }
+
 }
 
 // ─── ROUTER ───────────────────────────────────────────────────────────────────
