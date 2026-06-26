@@ -686,7 +686,7 @@ async function processUpdate(update) {
       if (!text.startsWith("/")) return; // abaikan pesan biasa di grup
       return sendMsg(chat.id, `🔒 ${name}, kamu belum di-add sama *_ANANG FATKHUROSIDIN_*.\nHubungi owner untuk mendapatkan akses.\nowner : @anang_fatkhurosidin`);
     }
-    return sendMsg(chat.id, `🔒 *Akses Ditolak*\n\nKamu belum di-add sama *Satria*.\nHubungi owner untuk mendapatkan akses.`);
+    return sendMsg(chat.id, `🔒 *Akses Ditolak*\n\nKamu belum di-add sama *_ANANG FATKHUROSIDIN_*.\nHubungi owner untuk mendapatkan akses.`);
   }
 
   // Owner commands
