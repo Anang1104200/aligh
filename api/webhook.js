@@ -577,7 +577,7 @@ async function handleStart(msg) {
   await tg("sendMessage", {
     chat_id: msg.chat.id,
     text:
-      `👋 Halo *${name}*! Selamat datang di *AM Premium Bot* 🎬\n\nBy _ANANG FATKHUROSIDIN_` +
+      `👋 Halo *${name}*! Selamat datang di *AM Premium Bot* 🎬\n\nBy _ANANG FATKHUROSIDIN_\n` +
       `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
       `Pilih menu di bawah untuk mulai:`,
     parse_mode: "Markdown",
